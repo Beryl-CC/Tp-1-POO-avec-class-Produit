@@ -6,8 +6,8 @@ class Produit:
         nb_produits : nombre total de produits (exemple ici fixé à 2)
     """
 
-    tva = 1.20
-    nb_produits = 2
+    tva = 20
+    nb_produits = 0
     
     def __init__(self, reference, nom, prix_ht, stock):
         """
@@ -18,11 +18,13 @@ class Produit:
         self.prix_ht = prix_ht
         self.stock = stock
 
+        Produit.nb_produits += 1
+
     def prix_ttc(self):
         """
         Retourne le prix TTC du produit.
         """
-        return self.prix_ht * Produit.tva
+        return self.prix_ht * (1 + Produit.tva / 100)
     
     def afficher(self):
         """
@@ -60,10 +62,9 @@ class Produit:
         """
         return self.prix_ht * self.stock
 
-
 p1 = Produit("KB-001", "Clavier mécanique RGB", 79.99, 15)
 p2 = Produit("MS-002", "Souris gaming 16000 DPI", 49.99, 25)
-
+p3 = Produit("MS-002", "Souris gaming 16000 DPI", 49.99, 25)
 p1.afficher()
 print(f"Valeur du stock: {p1.valeur_stock()}€")
 p1.retirer_stock(3)
