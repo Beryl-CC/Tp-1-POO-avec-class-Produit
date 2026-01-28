@@ -19,24 +19,25 @@ class Produit:
         self.stock = stock
 
         Produit.nb_produits += 1
-
+    
+    @property
     def prix_ttc(self):
         """
         Retourne le prix TTC du produit.
         """
-        return self.prix_ht * (1 + Produit.tva / 100)
+        return round(self._prix_ht * (1 + Produit.tva / 100), 2)
     
     def afficher(self):
         """
         Affiche les infos du produit : référence, nom, prix HT et TTC, stock.
         """
-        print(f"Réf: {self.reference} | {self.nom} | {self.prix_ht}€ HT ({self.prix_ttc():.2f}€ TTC) | Stock: {self.stock}")
+        print(f"Réf: {self._reference} | {self._nom} | {self._prix_ht:.2f}€ HT ({self.prix_ttc:.2f}€ TTC) | Stock: {self._stock}")
     
     def est_disponible(self):
         """
         Retourne True si le produit est en stock, False sinon.
         """
-        if self.stock >= 1:
+        if self._stock >= 1:
             return True
         else:
             return False
@@ -45,19 +46,61 @@ class Produit:
         """
         Ajoute une quantité donnée au stock du produit.
         """
-        self.stock += quantite
+        self._stock += quantite
     
     def retirer_stock(self, quantite):
         """
         Retire une quantité donnée du stock si possible, sinon affiche un message d'erreur.
         """
-        if self.stock >= quantite:
-            self.stock -= quantite
+        if self._stock >= quantite:
+            self._stock -= quantite
         else:
             print("Il n'y a plus ce produit en stock ou nous n'en avons pas assez pour votre requête")
     
+    @property
     def valeur_stock(self):
         """
         Retourne la valeur totale du stock du produit (prix HT * quantité).
         """
-        return self.prix_ht * self.stock
+        return round(self._prix_ht * self.stock, 2)
+    
+    @property
+    def reference(self):
+        return self._reference
+
+    @property
+    def nom(self):
+        return self._nom
+    
+    @property
+    def prix_ht(self):
+        return self._prix_ht
+    
+    @property
+    def stock(self):
+        return self._stock
+
+    @reference.setter
+    def reference(self, chaine):
+        if len(chaine) < 4:
+            raise ValueError("Chaine de caractère pas assez grande")
+        self._reference = chaine.upper()
+    
+    @nom.setter
+    def nom(self, chaine):
+        if len(chaine) < 3:
+            raise ValueError("Chaine de caractère pas assez grande")
+        self._nom = chaine
+    
+    @prix_ht.setter
+    def prix_ht(self, nombre):
+        if not isinstance(nombre, (int, float)) or nombre <= 0:
+            raise ValueError("Il faut un nombre positif")
+        round(nombre, 2)
+        self._prix_ht = round(nombre, 2)
+    
+    @stock.setter
+    def stock(self, nombre):
+        if not isinstance(nombre, int) or nombre < 0:
+            raise ValueError("Stock invalide")
+        self._stock = nombre
