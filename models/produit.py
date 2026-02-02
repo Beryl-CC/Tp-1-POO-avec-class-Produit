@@ -22,6 +22,27 @@ class Produit(ABC):
         self.stock = stock
 
         Produit.nb_produits += 1
+    
+    def __str__(self):
+        return f"{self.nom} ({self.reference} - {self.prix_ht}€ HT)"
+
+    def __repr__(self):
+        return f"Produit( Référence : {self.reference}, Nom : {self.nom}, Prix hors taxe : {self.prix_ht}, Stock : {self.stock})"
+    
+    def __eq__(self, other):
+        return self.reference == other.reference
+
+    def __lt__(self, other):
+        return self.prix_ht < other.prix_ht
+        
+    @classmethod
+    def from_dict(cls, data):
+        print(data)
+        return cls(data["ref"], data["nom"], data["prix"], data["stock"])
+    
+    @staticmethod
+    def valider_prix(prix):
+        return prix > 0
 
     @property
     def valeur_stock(self):
@@ -118,7 +139,7 @@ class Produit(ABC):
     
 
 class ProduitElectronique(Produit):
-    def __init__(self, reference, nom, prix_ht, stock, garantie_mois, poids_kg):
+    def __init__(self, reference, nom, prix_ht, stock = 0, garantie_mois = 12, poids_kg = 0.5):
         super().__init__(reference, nom, prix_ht, stock)
         self.garantie_mois = garantie_mois
         self.poids_kg = poids_kg
@@ -155,7 +176,7 @@ class ProduitAlimentaire(Produit):
 
     frais_livraison = 15
 
-    def __init__(self, reference, nom, prix_ht, stock, date_peremption):
+    def __init__(self, reference, nom, prix_ht, stock, date_peremption = "2026-06-15"):
         super().__init__(reference, nom, prix_ht, stock)
         self.date_peremption = date_peremption
     
@@ -169,6 +190,7 @@ class ProduitAlimentaire(Produit):
             ValueError("Il faut mettre la date sous forme de chaine de caractère valide")
         self._date_peremption = value
     
+    @property
     def calculer_frais_livraison(self):
         return ProduitAlimentaire.frais_livraison
     
@@ -176,11 +198,15 @@ class ProduitAlimentaire(Produit):
         print(f"Péremption: {self._date_peremption}")
     
     def est_perime(self):
+        print("DEBUG:", self._date_peremption)  # <- vérifie ce qu'il y a
         date_en_obj = date.fromisoformat(self._date_peremption)
-        date_peremption = date_en_obj < date.today()
-        if date_peremption == True:
-            print("La date de péremption n'a pas encore été atteinte")
-        else:
-            print("La date de péremption a déjà été atteinte")
-        
+        est_perime = date_en_obj < date.today()
+        print("DEBUG est_perime:", est_perime)
+        return est_perime
 
+
+class ProductFactory:
+
+    @staticmethod
+    def create(type_class, data):
+        return type_class.from_dict(data)

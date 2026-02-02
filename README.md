@@ -212,3 +212,73 @@ print(fromage.est_perime())  # False (ou True selon la date)
 - Utilisez `from datetime import date` pour les dates
 - `date.fromisoformat("2025-06-15")` pour convertir une chaîne
 - `est_perime(): return self._date_peremption < date.today()`
+
+
+# TP6 : Inventaire polymorphe
+
+## Objectif
+
+Créer une classe Inventaire qui gère tous les types de produits.
+
+## Instructions
+
+- Créez une classe Inventaire avec une liste de produits
+- Méthode `ajouter(produit)` : vérifie que c'est bien un Produit
+- Méthode `total_frais_livraison()` : somme des frais de tous les produits
+- Méthode `lister_par_type(type_classe)` : filtre par type
+- Méthode `produits_perimes()` : liste des alimentaires périmés
+
+## Exemple d'utilisation
+
+```python
+inv = Inventaire()
+
+inv.ajouter(ProduitElectronique("KB-001", "Clavier", 79.99, 15, 24, 0.5))
+inv.ajouter(ProduitElectronique("SC-001", "Écran", 299.99, 5, 36, 5.0))
+inv.ajouter(ProduitAlimentaire("ALI-001", "Comté", 12.99, 50, "2025-06-15"))
+inv.ajouter(ProduitAlimentaire("ALI-002", "Lait", 1.50, 100, "2024-01-01"))  # Périmé
+
+print(inv.total_frais_livraison())  # 51.0 (11 + 20 + 15 + 15)
+print(len(inv.lister_par_type(ProduitElectronique)))  # 2
+print(len(inv.produits_perimes()))  # 1 (le lait)
+```
+
+## Indices
+
+- `isinstance(produit, Produit)` pour vérifier le type
+- `[p for p in self._produits if isinstance(p, type_classe)]`
+- Pour les périmés : filtrez les `ProduitAlimentaire` puis vérifiez `est_perime()`
+
+
+# TP7 : Produit avec méthodes magiques
+
+## Objectif
+
+Enrichir la classe Produit avec les méthodes spéciales.
+
+## Instructions
+
+- Implémentez `__str__` : "Clavier RGB (KB-001) - 79.99€ HT"
+- Implémentez `__repr__` : "Produit('KB-001', 'Clavier RGB', 79.99)"
+- Implémentez `__eq__` : deux produits sont égaux si même référence
+- Implémentez `__lt__` : comparaison par prix
+- Ajoutez `@classmethod from_dict(cls, data)`
+- Ajoutez `@staticmethod valider_prix(prix)`
+
+## Tests
+
+```python
+p1 = Produit("KB-001", "Clavier", 79.99)
+p2 = Produit.from_dict({"ref": "MS-001", "nom": "Souris", "prix": 49.99})
+
+print(p1)                   # Clavier (KB-001) - 79.99€ HT
+print(repr(p1))             # Produit('KB-001', 'Clavier', 79.99)
+print(p1 < p2)              # False (79.99 > 49.99)
+print(sorted([p1, p2]))     # [Souris, Clavier]
+print(valider_prix(-30))    # False
+print(valider_prix(49,99))  # True
+```
+
+## Indices
+
+- Pour trier, implémentez juste `__lt__`
